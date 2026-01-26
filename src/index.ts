@@ -103,6 +103,10 @@ export default {
   async fetch(request: Request, env: { FILTER_LIST: string }) {
     const { method, headers, url } = request;
 
+    if (new URL(url).pathname !== '/dns-query') {
+      return new Response('Not Found', { status: 404 });
+    }
+
     if (method === 'POST' && headers.get('content-type') === 'application/dns-message') {
       const buffer = await request.arrayBuffer();
       return handleDohRequest(request, buffer);
