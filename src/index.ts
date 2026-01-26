@@ -52,7 +52,7 @@ function base64UrlToBuffer(base64url: string): Uint8Array {
 
 // --- HANDLER ---
 
-async function handleDohRequest(packetBuffer: ArrayBuffer) {
+async function handleDohRequest(request: Request, packetBuffer: ArrayBuffer) {
   const domain = extractDomainFromPacket(packetBuffer);
 
   if (domain && isDomainBlocked(domain)) {
@@ -63,13 +63,20 @@ async function handleDohRequest(packetBuffer: ArrayBuffer) {
     );
   }
 
+  const upstreamHeaders: HeadersInit = {
+    'Content-Type': 'application/dns-message',
+    'Accept': 'application/dns-message',
+  };
+
+  const clientIP = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For');
+  if (clientIP) {
+    upstreamHeaders['X-Forwarded-For'] = clientIP;
+  }
+
   const upstreamResponse = await fetch(UPSTREAM_DOH, {
     method: 'POST',
     body: packetBuffer,
-    headers: {
-      'Content-Type': 'application/dns-message',
-      'Accept': 'application/dns-message',
-    },
+    headers: upstreamHeaders,
   });
 
   if (!upstreamResponse.ok) {
@@ -98,7 +105,7 @@ export default {
 
     if (method === 'POST' && headers.get('content-type') === 'application/dns-message') {
       const buffer = await request.arrayBuffer();
-      return handleDohRequest(buffer);
+      return handleDohRequest(request, buffer);
     }
 
     if (method === 'GET') {
@@ -114,7 +121,7 @@ export default {
 
       try {
         const buffer = base64UrlToBuffer(dnsParam);
-        return handleDohRequest(buffer.slice().buffer);
+        return handleDohRequest(request, buffer.slice().buffer);
       } catch (e) {
         return new Response(JSON.stringify({ error: 'Invalid DNS parameter encoding' }), {
           status: 400,
