@@ -1,0 +1,6 @@
+# Cloudflare DoH Server 
+- Supports an Adguard blocklist, available at https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+- Compiles the filter.txt to ts at build
+- Forwards X-Forward-For IP to ensure you get local results
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/xiliourt/nextjs-doh-server_with-block-list/)
