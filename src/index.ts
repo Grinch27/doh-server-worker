@@ -1,6 +1,6 @@
 import { BLOCKLIST } from './constants';
 
-const UPSTREAM_DOH = 'https://dns.google/dns-query';
+const UPSTREAM_DOH = 'https://dns.cloudflare.com/dns-query';
 
 // --- LOGIC ---
 
