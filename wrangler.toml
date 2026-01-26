@@ -4,3 +4,6 @@ compatibility_date = "2024-01-01"
 
 [vars]
 FILTER_LIST = { binding = "FILTER_LIST", type = "text_blob" }
+
+[build]
+command = "node generate-blocklist.js"
